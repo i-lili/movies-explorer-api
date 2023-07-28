@@ -1,30 +1,25 @@
 const jwt = require('jsonwebtoken');
 const { UnauthorizedError } = require('../errors/Errors');
+const { JWT_SECRET } = require('../config');
+const { ERROR_MESSAGES } = require('../constants');
 
-// Экспортируем middleware для проверки авторизации пользователя
 module.exports = (req, res, next) => {
-// Извлекаем заголовок авторизации
   const { authorization } = req.headers;
 
-  // Проверяем наличие и формат заголовка
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    throw new UnauthorizedError('Authorization required');
+    throw new UnauthorizedError(ERROR_MESSAGES.AUTHORIZATION_REQUIRED);
   }
 
-  // Удаляем "Bearer " из заголовка, чтобы получить токен
   const token = authorization.replace('Bearer ', '');
   let payload;
 
-  // Верифицируем токен
   try {
-    payload = jwt.verify(token, process.env.JWT_SECRET || 'development-secret');
+    payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    throw new UnauthorizedError('Authorization required');
+    throw new UnauthorizedError(ERROR_MESSAGES.AUTHORIZATION_REQUIRED);
   }
 
-  // Если верификация прошла успешно, добавляем payload в запрос
   req.user = payload;
 
-  // Передаём обработку запроса дальше
   next();
 };

@@ -1,9 +1,6 @@
 const Movie = require('../models/movie');
-const {
-  NotFoundError,
-  ForbiddenError,
-  BadRequestError,
-} = require('../errors/Errors');
+const { NotFoundError, ForbiddenError, BadRequestError } = require('../errors/Errors');
+const { ERROR_MESSAGES } = require('../constants'); // импортирование сообщений об ошибках
 
 // Получение всех сохранённых пользователем фильмов
 const getUserMovies = async (req, res, next) => {
@@ -67,11 +64,11 @@ const deleteMovie = async (req, res, next) => {
     const movie = await Movie.findById(_id);
 
     if (!movie) {
-      throw new NotFoundError('Фильм не найден');
+      throw new NotFoundError(ERROR_MESSAGES.MOVIE_NOT_FOUND);
     }
 
     if (!movie.owner.equals(userId)) {
-      throw new ForbiddenError('Нельзя удалять чужие фильмы');
+      throw new ForbiddenError(ERROR_MESSAGES.FORBIDDEN);
     }
 
     await Movie.deleteOne(movie);

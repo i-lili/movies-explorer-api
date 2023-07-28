@@ -7,7 +7,7 @@ API для проекта Movies Explorer, включающий авториза
 IP 51.250.88.97
 
 Публичный сервер доступен по адресу:
-api.moviesdiploma.nomoreparties.sbs
+https://api.moviesdiploma.nomoreparties.sbs
 
 Репозиторий проекта доступен на GitHub:
 https://github.com/i-lili/movies-explorer-api.git

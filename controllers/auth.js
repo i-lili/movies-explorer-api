@@ -1,11 +1,9 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
-const {
-  BadRequestError,
-  ConflictError,
-  UnauthorizedError,
-} = require('../errors/Errors');
+const { BadRequestError, ConflictError, UnauthorizedError } = require('../errors/Errors');
+const { ERROR_MESSAGES } = require('../constants'); // импортирование сообщений об ошибках
+const { JWT_SECRET } = require('../config'); // импортирование конфигурации
 
 // Регистрация нового пользователя
 const signup = async (req, res, next) => {
@@ -23,7 +21,7 @@ const signup = async (req, res, next) => {
     });
   } catch (error) {
     if (error.code === 11000) {
-      next(new ConflictError('Пользователь с таким email уже существует'));
+      next(new ConflictError(ERROR_MESSAGES.EMAIL_CONFLICT));
     } else if (error.name === 'ValidationError') {
       next(new BadRequestError(error.message));
     } else {
@@ -38,9 +36,9 @@ const signin = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select('+password');
     if (!user || !await bcrypt.compare(password, user.password)) {
-      throw new UnauthorizedError('Неправильные почта или пароль');
+      throw new UnauthorizedError(ERROR_MESSAGES.UNAUTHORIZED);
     }
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET || 'development-secret', {
+    const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
       expiresIn: '7d',
     });
     res.send({ token });
