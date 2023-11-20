@@ -2,10 +2,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const { BadRequestError, ConflictError, UnauthorizedError } = require('../errors/Errors');
-const { ERROR_MESSAGES } = require('../constants'); // импортирование сообщений об ошибках
-const { JWT_SECRET } = require('../config'); // импортирование конфигурации
+const { ERROR_MESSAGES } = require('../constants');
+const { JWT_SECRET } = require('../config');
 
-// Регистрация нового пользователя
 const signup = async (req, res, next) => {
   try {
     const { email, password, name } = req.body;
@@ -15,9 +14,15 @@ const signup = async (req, res, next) => {
       password: hashedPassword,
       name,
     });
+
+    const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+      expiresIn: '7d',
+    });
+
     res.status(201).send({
       name: user.name,
       email: user.email,
+      token, // Используем сокращенный синтаксис и удаляем комментарий
     });
   } catch (error) {
     if (error.code === 11000) {
@@ -30,7 +35,6 @@ const signup = async (req, res, next) => {
   }
 };
 
-// Вход пользователя
 const signin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
